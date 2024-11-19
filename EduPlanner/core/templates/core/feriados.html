@@ -1,0 +1,29 @@
+{% extends 'core/base.html' %} {% block main %}
+<h2>Feriados</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>País</th>
+      <th>Fecha</th>
+      <th>Tipo</th>
+      <th>Tipo Principal</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in feriados %}
+    <tr>
+      <td>{{ f.name }}</td>
+      <td>{{ f.description }}</td>
+      <td>{{ f.country }}</td>
+      <td>{{ f.date }}</td>
+      <td>{{ f.type }}</td>
+      <td>{{ f.primary_type }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
