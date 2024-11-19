@@ -2,8 +2,7 @@ from django.shortcuts import render
 from .models import Feriado , Evento
 from creds import api_key
 import requests
-
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def home(request):
@@ -43,7 +42,7 @@ def feriados(request):
     
     }
     return render(request,'core/feriados.html', data)
-
+@login_required
 def eventos(request):
     titulo = "Eventos"
     data = {
