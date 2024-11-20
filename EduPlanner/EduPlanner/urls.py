@@ -24,5 +24,6 @@ urlpatterns = [
     path('',home, name='home'),
     path('feriados/',feriados, name='feriados'),
     path('eventos/',eventos, name='eventos'),
-    
+    path("inicioSesion/",iniciarSesion,name="iniciarSesion"),
+    path("registrar/",registrarse,name="registrarse"),
 ]

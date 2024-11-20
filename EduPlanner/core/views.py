@@ -1,6 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from .models import Feriado , Evento
-from creds import api_key
+from .creds import api_key
+from django.contrib.auth import login
+from django.contrib import messages
+from .forms import FormularioInicioSesion,FormularioRegistro
+from django.contrib.auth import authenticate
 import requests
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -49,3 +53,28 @@ def eventos(request):
         "titulo": titulo
     }
     return render(request,'core/eventos.html', data)
+def registrarse(request):
+    if request.method == 'POST':
+        form = FormularioRegistro(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = FormularioRegistro()
+    return render(request, 'core/registrarse.html', {'form': form})
+def iniciarSesion(request):
+    if request.method == 'POST':
+        form = FormularioInicioSesion(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, username=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.error(request, "Correo o contraseña incorrectos")
+    else:
+        form = FormularioInicioSesion()
+    return render(request, 'core/inicioSesion.html', {'form': form})
