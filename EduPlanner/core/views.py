@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from .models import Feriado , Evento
-from .creds import api_key
+from creds import api_key
 from django.contrib.auth import login
 from django.contrib import messages
 from .forms import FormularioInicioSesion,FormularioRegistro
