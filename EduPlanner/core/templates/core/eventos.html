@@ -1,3 +1,103 @@
 {% extends 'core/base.html' %} {% block main %}
-<h2>Eventos</h2>
+<h1>Crear Evento</h1>
+<form id="eventoForm">
+    <!-- Título -->
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" name="titulo" required>
+    <br><br>
+
+    <!-- Descripción -->
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion" required></textarea>
+    <br><br>
+
+    <!-- Fecha de Inicio -->
+    <label for="fecha_inicio">Fecha de Inicio:</label>
+    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+    <br><br>
+
+    <!-- Fecha de Fin -->
+    <label for="fecha_fin">Fecha de Fin:</label>
+    <input type="date" id="fecha_fin" name="fecha_fin" required>
+    <br><br>
+
+    <!-- Tipo de Evento -->
+    <label for="tipo">Tipo de Evento:</label>
+    <select id="tipo" name="tipo" required>
+        <!-- Aquí se cargarán los tipos desde la API -->
+    </select>
+    <br><br>
+
+    <!-- Botón de Enviar -->
+    <button type="submit">Crear Evento</button>
+</form>
+
+<script>
+    // URL de la API
+    const tiposApiUrl = "http://127.0.0.1:8000/api/tipo_evento/";
+    const eventosApiUrl = "http://127.0.0.1:8000/api/eventos/";
+
+    // Cargar tipos de eventos al inicializar la página
+    async function cargarTipos() {
+        try {
+            const response = await fetch(tiposApiUrl);
+            if (response.ok) {
+                const tipos = await response.json();
+                const tipoSelect = document.getElementById("tipo");
+
+                // Agregar opciones al select
+                tipos.forEach(tipo => {
+                    const option = document.createElement("option");
+                    option.value = tipo.id;
+                    option.textContent = tipo.tipo;
+                    tipoSelect.appendChild(option);
+                });
+            } else {
+                console.error("Error al cargar los tipos de evento");
+            }
+        } catch (error) {
+            console.error("Error al conectar con la API:", error);
+        }
+    }
+
+    // Enviar datos del formulario
+    document.getElementById("eventoForm").addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        // Capturar datos del formulario
+        const data = {
+            titulo: document.getElementById("titulo").value,
+            descripcion: document.getElementById("descripcion").value,
+            fecha_inicio: document.getElementById("fecha_inicio").value,
+            fecha_fin: document.getElementById("fecha_fin").value,
+            tipo: document.getElementById("tipo").value
+        };
+
+        try {
+            const response = await fetch(eventosApiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                alert("Evento creado exitosamente");
+                document.getElementById("eventoForm").reset();
+            } else {
+                const errorData = await response.json();
+                console.error("Error al crear el evento:", errorData);
+                alert("Hubo un error al crear el evento");
+            }
+        } catch (error) {
+            console.error("Error al conectar con la API:", error);
+            alert("No se pudo conectar con la API");
+        }
+    });
+
+    // Llamar a la función para cargar los tipos de eventos al cargar la página
+    window.onload = cargarTipos;
+</script>
+
 {% endblock %}
