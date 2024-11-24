@@ -3,11 +3,22 @@ from .models import Feriado , Evento
 from creds import api_key
 from django.contrib.auth import login
 from django.contrib import messages
-from .forms import FormularioInicioSesion,FormularioRegistro
+from .forms import FormularioInicioSesion,FormularioRegistro, FormularioEvento
 from django.contrib.auth import authenticate
 import requests
 from django.contrib.auth.decorators import login_required
 # Create your views here.
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import permission_classes
+@api_view(['POST'])
+@permission_classes([IsAdminUser])
+def get_auth_token(request):
+    user = request.user
+    token, created = Token.objects.get_or_create(user=user)
+    return Response({'token': token.key})
 
 def home(request):
     titulo = "Inicio"
@@ -49,10 +60,20 @@ def feriados(request):
 @login_required
 def eventos(request):
     titulo = "Eventos"
+    if request.method == 'POST':
+        form = FormularioEvento(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Evento creado exitosamente")
+            return redirect('eventos')
+    else:
+        token, created = Token.objects.get_or_create(user=request.user)
+        form = FormularioEvento(initial={'auth_token': token.key})
     data = {
-        "titulo": titulo
+        "titulo": titulo,
+        "form": form
     }
-    return render(request,'core/eventos.html', data)
+    return render(request, 'core/eventos.html', data)
 def registrarse(request):
     if request.method == 'POST':
         form = FormularioRegistro(request.POST)
