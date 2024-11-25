@@ -3,10 +3,8 @@
 
 <h1>Eventos</h1>
 
-<!-- Add the filter select element here -->
 <select id="tipo-filter">
   <option value="">Todos</option>
-  <!-- We'll populate the options dynamically later -->
 </select>
 
 <table class="table table-striped">
@@ -15,7 +13,6 @@
       <th>Título</th>
       <th>Descripción</th>
       <th>Fecha de Inicio</th>
-      <th>Fecha de Fin</th>
       <th>Tipo</th>
     </tr>
   </thead>
@@ -26,59 +23,70 @@
 
 <script>
   // Get the table body element
-  const tableBody = document.querySelector('#eventos-table');
-  
-  // Make an AJAX request to the API endpoint
-  fetch('/api/eventos/')
-    .then(response => response.json())
-    .then(data => {
-      // Make another AJAX request to fetch the tipo data
-      fetch('/api/tipos_evento/')
-        .then(response => response.json())
-        .then(tiposData => {
-          // Populate the filter select element options
-          const tipoFilterSelect = document.getElementById('tipo-filter');
-          tiposData.forEach(tipo => {
-            const option = document.createElement('option');
-            option.value = tipo.id;
-            option.textContent = tipo.tipo;
-            tipoFilterSelect.appendChild(option);
-          });
-          
-          // Update the table with the received data
-          data.forEach(evento => {
-            const tipo = tiposData.find(tipo => tipo.id === evento.tipo);
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${evento.titulo}</td>
-              <td>${evento.descripcion}</td>
-              <td>${evento.fecha_inicio}</td>
-              <td>${evento.fecha_fin}</td>
-              <td>${tipo ? tipo.tipo : ''}</td>
-            `;
-            tableBody.appendChild(row);
-          });
-          
-          // Add an event listener to the select element to filter the table
-          tipoFilterSelect.addEventListener('change', function() {
-            const selectedTipoId = this.value;
-            const rows = tableBody.rows;
-            
-            // Hide all rows initially
-            for (let i = 0; i < rows.length; i++) {
-              rows[i].style.display = 'none';
-            }
-            
-            // Show only the rows that match the selected tipo
-            data.forEach(evento => {
-    const tipo = tiposData.find(tipo => tipo.id === evento.tipo);
-    if (selectedTipoId === '' || tipo.id === parseInt(selectedTipoId)) {
-      const row = tableBody.querySelector(`tr:nth-child(${data.indexOf(evento) + 1})`);
-      row.style.display = '';
-    }
-            });
-          });
+  const tableBody = document.querySelector("#eventos-table");
+  const tipoFilterSelect = document.getElementById("tipo-filter"); 
+
+  fetch("/api/fusion/")
+    .then((response) => response.json())
+    .then((data) => {
+
+      data.fusion.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      data.fusion.forEach((item) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.name}</td>
+          <td>${item.description}</td>
+          <td>${item.date}</td>
+          <td>${
+            item.primary_type ||
+            (Array.isArray(item.type) ? item.type[0] : item.type)
+          }</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Populate the filter select element
+      const tipos = [];
+      data.fusion.forEach((item) => {
+        if (item.event_type === "evento") {
+          tipos.push(item.type);
+        } else {
+          tipos.push("Feriado");
+        }
+      });
+      const uniqueTipos = [...new Set(tipos)];
+      uniqueTipos.forEach((tipo) => {
+        const option = document.createElement("option");
+        option.value = tipo;
+        option.text = tipo;
+        tipoFilterSelect.appendChild(option);
+      });
+
+      tipoFilterSelect.addEventListener("change", function () {
+        const selectedTipoId = this.value;
+        const rows = tableBody.rows;
+
+        // Hide all rows initially
+        for (let i = 0; i < rows.length; i++) {
+          rows[i].style.display = "none";
+        }
+
+        // Show only the rows that match the selected tipo
+        data.fusion.forEach((evento, index) => {
+          const tipo =
+            evento.primary_type ||
+            (Array.isArray(evento.type) ? evento.type[0] : evento.type);
+          if (
+            selectedTipoId === "" ||
+            (selectedTipoId === "Feriado" && evento.event_type !== "evento") ||
+            tipo === selectedTipoId
+          ) {
+            const row = tableBody.rows[index];
+            row.style.display = "";
+          }
         });
+      });
     });
 </script>
 
