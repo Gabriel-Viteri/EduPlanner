@@ -1,3 +1,45 @@
 {% extends 'core/base.html' %} {% block main %}
 <h2>Home</h2>
+
+<h1>Eventos</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Fecha de Inicio</th>
+        <th>Fecha de Fin</th>
+        <th>Tipo</th>
+        
+      </tr>
+    </thead>
+    <tbody id="eventos-table">
+      <!-- data will be inserted here -->
+    </tbody>
+  </table>
+
+  <script>
+    // Get the table body element
+    const tableBody = document.querySelector('#eventos-table');
+
+    // Make an AJAX request to the API endpoint
+    fetch('/api/eventos/')
+      .then(response => response.json())
+      .then(data => {
+        // Update the table with the received data
+        data.forEach(evento => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${evento.titulo}</td>
+            <td>${evento.descripcion}</td>
+            <td>${evento.fecha_inicio}</td>
+            <td>${evento.fecha_fin}</td>
+            <td>${evento.tipo}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  </script>
+
 {% endblock %}
