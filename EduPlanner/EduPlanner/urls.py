@@ -29,4 +29,5 @@ urlpatterns = [
     path('inicioSesion/',iniciarSesion,name="iniciarSesion"),
     path('cerrarSesion/', auth_views.LogoutView.as_view(next_page='iniciarSesion'), name='cerrarSesion'),
     path("registrar/",registrarse,name="registrarse"),
+    path('', include('rest.urls')),
 ]

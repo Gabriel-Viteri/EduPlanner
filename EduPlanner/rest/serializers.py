@@ -1,6 +1,6 @@
 from core.models import Evento,TipoEvento
 
-from rest_framework import routers, serializers
+from rest_framework import serializers
 
 class EventoSerializer(serializers.ModelSerializer):
     class Meta:

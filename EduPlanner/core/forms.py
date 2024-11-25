@@ -1,10 +1,8 @@
 from django import forms
-from django.contrib.auth.models import User, Group 
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
-from .models import Evento
-
 ROLES = [
     ('Administrador Academico', 'Administrador Academico'),
 ]
@@ -45,25 +43,3 @@ class FormularioInicioSesion(forms.Form):
         if not user:
             raise forms.ValidationError("Correo o contraseña incorrectos")
         return self.cleaned_data
-    
-
-class FormularioEvento(forms.ModelForm):
-    auth_token = forms.CharField(widget=forms.HiddenInput())
-
-    class Meta:
-        model = Evento
-        fields = ['titulo', 'descripcion', 'fecha_inicio', 'fecha_fin', 'tipo', 'auth_token']
-        labels = {
-            'titulo': 'Título',
-            'descripcion': 'Descripción',
-            'fecha_inicio': 'Fecha de inicio',
-            'fecha_fin': 'Fecha de fin',
-            'tipo': 'Tipo de evento',
-        }
-        widgets = {
-            'titulo': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'fecha_inicio': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'fecha_fin': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'tipo': forms.Select(attrs={'class': 'form-control'}),
-        }

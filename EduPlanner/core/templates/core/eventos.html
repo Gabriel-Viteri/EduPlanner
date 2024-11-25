@@ -1,25 +1,73 @@
-{% extends 'core/base.html' %} {% block main %}
+{% extends 'core/base.html' %}
+
+{% block main %}
 <h1>Crear Evento</h1>
-<form method="post">
+<form id="eventoForm" method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Crear</button>
+    
+    <!-- Título -->
+    <label for="titulo">Título:</label>
+    <input type="text" id="titulo" name="titulo" required>
+    <br><br>
+
+    <!-- Descripción -->
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion" required></textarea>
+    <br><br>
+
+    <!-- Fecha de Inicio -->
+    <label for="fecha_inicio">Fecha de Inicio:</label>
+    <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+    <br><br>
+
+    <!-- Fecha de Fin -->
+    <label for="fecha_fin">Fecha de Fin:</label>
+    <input type="date" id="fecha_fin" name="fecha_fin" required>
+    <br><br>
+
+    <!-- Tipo de Evento -->
+    <label for="tipo">Tipo de Evento:</label>
+    <select id="tipo" name="tipo" required>
+        <!-- Aquí se cargarán los tipos desde la API -->
+    </select>
+    <br><br>
+
+    <!-- Botón de Enviar -->
+    <button type="submit">Crear Evento</button>
 </form>
 
 <script>
     // URL de la API
-    const tiposApiUrl = "http://127.0.0.1:8000/api/tipo_evento/";
+    const tiposApiUrl = "http://127.0.0.1:8000/api/tipos_evento/";
     const eventosApiUrl = "http://127.0.0.1:8000/api/eventos/";
-    const token = 'YOUR_AUTH_TOKEN'; // Reemplaza con tu token de autenticación
+
+    // Función para obtener el valor de una cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Obtener el token CSRF de las cookies
+    const csrfToken = getCookie('csrftoken');
 
     // Cargar tipos de eventos al inicializar la página
     async function cargarTipos() {
         try {
             const response = await fetch(tiposApiUrl, {
-                headers: {
-                    'Authorization': `Token ${token}`
-                }
+                method: "GET",
+                credentials: "same-origin"  // Esto asegura que se envíen las cookies de sesión
             });
+
             if (response.ok) {
                 const tipos = await response.json();
                 const tipoSelect = document.getElementById("tipo");
@@ -57,9 +105,10 @@
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    'Authorization': `Token ${token}`
+                    "X-CSRFToken": csrfToken  // Añadir token CSRF en las cabeceras
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(data),
+                credentials: "same-origin"  // Asegura que las cookies se envíen
             });
 
             if (response.ok) {
@@ -78,7 +127,7 @@
 
     // Llamar a la función para cargar los tipos de eventos al cargar la página
     window.onload = cargarTipos;
+    //nueva forma de insert
 </script>
 
 {% endblock %}
-
