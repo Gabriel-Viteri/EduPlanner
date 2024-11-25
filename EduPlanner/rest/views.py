@@ -11,5 +11,5 @@ class EventoViewSet(viewsets.ModelViewSet):
 class TipoEventoViewSet(viewsets.ModelViewSet):
     queryset = TipoEvento.objects.all()
     serializer_class = TipoEventoSerializer
-    permission_classes = [IsAuthenticated]  # Solo los usuarios autenticados pueden acceder
+    permission_classes = [IsAuthenticatedOrReadOnly]  # Solo los usuarios autenticados pueden acceder
 

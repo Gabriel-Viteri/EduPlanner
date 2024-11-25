@@ -19,27 +19,34 @@
   </table>
 
   <script>
-    // Get the table body element
-    const tableBody = document.querySelector('#eventos-table');
-
-    // Make an AJAX request to the API endpoint
-    fetch('/api/eventos/')
-      .then(response => response.json())
-      .then(data => {
-        // Update the table with the received data
-        data.forEach(evento => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${evento.titulo}</td>
-            <td>${evento.descripcion}</td>
-            <td>${evento.fecha_inicio}</td>
-            <td>${evento.fecha_fin}</td>
-            <td>${evento.tipo}</td>
-          `;
-          tableBody.appendChild(row);
-        });
-      })
-      .catch(error => console.error('Error fetching data:', error));
+   // Get the table body element
+   const tableBody = document.querySelector('#eventos-table');
+   
+   // Make an AJAX request to the API endpoint
+   fetch('/api/eventos/')
+     .then(response => response.json())
+     .then(data => {
+       // Make another AJAX request to fetch the tipo data
+       fetch('/api/tipos_evento/')
+         .then(response => response.json())
+         .then(tiposData => {
+           // Update the table with the received data
+           data.forEach(evento => {
+             const tipo = tiposData.find(tipo => tipo.id === evento.tipo);
+             const row = document.createElement('tr');
+             row.innerHTML = `
+               <td>${evento.titulo}</td>
+               <td>${evento.descripcion}</td>
+               <td>${evento.fecha_inicio}</td>
+               <td>${evento.fecha_fin}</td>
+               <td>${tipo ? tipo.tipo : ''}</td>
+             `;
+             tableBody.appendChild(row);
+           });
+         })
+         .catch(error => console.error('Error fetching tipo data:', error));
+     })
+     .catch(error => console.error('Error fetching eventos data:', error));
   </script>
 
 {% endblock %}
