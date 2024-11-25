@@ -2,7 +2,7 @@ import requests
 from rest_framework.response import Response
 from rest_framework import viewsets
 from .serializers import EventoSerializer, TipoEventoSerializer
-from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly, IsAdminUser
 from core.models import Evento, TipoEvento
 from rest_framework.views import APIView
 import requests
@@ -13,7 +13,7 @@ from creds import api_key
 class EventoViewSet(viewsets.ModelViewSet):
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]  
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminUser]   
 
 
 class TipoEventoViewSet(viewsets.ModelViewSet):
@@ -22,7 +22,10 @@ class TipoEventoViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticatedOrReadOnly]  # Solo los usuarios autenticados pueden acceder
 
 class Feriados_fusionadosViewSet(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]  # Solo los usuarios autenticados pueden acceder
+
     def get(self, request, *args, **kwargs):
+        
         # Obtener los feriados de la API externa (Calendarific)
         url = f"https://calendarific.com/api/v2/holidays?&api_key={api_key}&country=CL&year=2024"
         response = requests.get(url)

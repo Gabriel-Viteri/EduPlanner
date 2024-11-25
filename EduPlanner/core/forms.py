@@ -5,6 +5,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 ROLES = [
     ('Administrador Academico', 'Administrador Academico'),
+    ('Estudiante', 'Estudiante'),
+    ('Profesor', 'Profesor'),
 ]
 
 class FormularioRegistro(UserCreationForm):
